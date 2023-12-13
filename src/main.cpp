@@ -1,13 +1,11 @@
 /* Author: Taisyu Shibata */
 
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 
-#include "raspi_on_truck.h"
-
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
-    ros::init(argc, argv, "raspi_on_truck");
-
-    ros::spin();
-    return(0);
+  rclcpp::init(argc, argv);
+//  rclcpp::spin();
+  rclcpp::shutdown();
+  return 0;
 }
