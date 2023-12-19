@@ -12,6 +12,7 @@ find_package(ament_cmake REQUIRED)
 # find_package(<dependency> REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(SDL REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -25,11 +26,14 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_executable(raspi_on_truck src/main.cpp)
+add_executable(raspi_on_truck src/raspi_on_truck.cpp)
 ament_target_dependencies(raspi_on_truck rclcpp std_msgs)
+add_executable(f310 src/f310.cpp)
+ament_target_dependencies(f310 rclcpp std_msgs SDL)
 
 install(TARGETS
   raspi_on_truck
+  f310
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
