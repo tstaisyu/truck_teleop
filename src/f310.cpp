@@ -37,6 +37,7 @@ private:
             int r_y = SDL_JoystickGetAxis(joystick_, 4) * -100;
             int l_y = SDL_JoystickGetAxis(joystick_, 1) * -100;
             message.data = {r_y, l_y};
+            RCLCPP_INFO(this->get_logger(), "Right : %d, Left : %d", r_y, l_y);
             publisher_->publish(message);
         }
     }
