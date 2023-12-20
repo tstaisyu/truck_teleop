@@ -31,6 +31,13 @@ ament_target_dependencies(raspi_on_truck rclcpp std_msgs)
 add_executable(f310 src/f310.cpp)
 ament_target_dependencies(f310 rclcpp std_msgs SDL)
 
+target_compile_options(raspi_on_truck
+  PUBLIC -Wall -pthread
+)
+target_link_libraries(raspi_on_truck
+  pigpio
+)
+
 install(TARGETS
   raspi_on_truck
   f310

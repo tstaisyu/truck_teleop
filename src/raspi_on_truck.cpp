@@ -13,7 +13,7 @@
 #define ENABLE_r 17
 #define ENABLE_l 18
 
-class SubscriberNode : public rclcpp::Node
+class SubscriberNode : public rclcpp::Node 
 {
 public:
     SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0)
