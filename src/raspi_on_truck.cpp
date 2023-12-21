@@ -38,8 +38,16 @@ public:
 
         // GPIO PWM setup code here
 
-        subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
-            "velocity", 10, std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
+        try {
+            subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
+                "velocity", 10, std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
+        } catch (const std::exception& e) {
+            RCLCPP_ERROR(this->get_logger(), "Subscription initialization failed: %s", e.what());
+            rclcpp::shutdown();
+        }
+
+//        subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
+//            "velocity", 10, std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
     }
 
     ~SubscriberNode() {
@@ -49,7 +57,20 @@ public:
 private:
     void toGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
     {
+        if (msg == nullptr) {
+            RCLCPP_ERROR(this->get_logger(), "Received null pointer in callback");
+            return;
+        }
         RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
+        RCLCPP_INFO(this->get_logger(), "Received message in toGpio callback.");
+        if (msg->data.size() >= 2) {
+            joy_r = msg->data[0];
+            joy_l = msg->data[1];
+        // GPIO操作のロジックをここに実装します
+            RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", joy_r, joy_l);
+        } else {
+            RCLCPP_ERROR(this->get_logger(), "Received joystick data is not valid.");
+        }
     }
 
     rclcpp::Subscription<std_msgs::msg::Int32MultiArray>::SharedPtr subscription_;
@@ -59,6 +80,11 @@ private:
 int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
+
+    // ロガーレベルを DEBUG または INFO に設定
+    rclcpp::Logger logger = rclcpp::get_logger("SubscriberNode");
+    rclcpp::Logger::set_level(rclcpp::Logger::Level::Debug);
+
     try {
         auto node = std::make_shared<SubscriberNode>();
         rclcpp::spin(node);
