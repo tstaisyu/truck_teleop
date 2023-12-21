@@ -39,7 +39,7 @@ public:
         RCLCPP_INFO(this->get_logger(), "GPIO set up completed.");
 
         subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
-            "velocity", rclcpp::QoS(10), std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
+            "velocity", rclcpp::SystemDefaultsQoS(), std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
         RCLCPP_INFO(this->get_logger(), "Subscription created successfully.");
     }
 
@@ -50,8 +50,14 @@ public:
 private:
     void toGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
     {
-        if (!msg || msg->data.size() < 2) {
-            RCLCPP_ERROR(this->get_logger(), "Invalid joystick data received.");
+        RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
+        if (!msg) {
+            RCLCPP_ERROR(this->get_logger(), "Received null pointer in callback");
+            return;
+        }
+
+        if (msg->data.size() < 2) {
+            RCLCPP_ERROR(this->get_logger(), "Invalid joystick data size: %zu", msg->data.size());
             return;
         }
 
