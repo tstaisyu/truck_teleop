@@ -1,6 +1,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/int32_multi_array.hpp>
 #include <SDL/SDL.h>
+#include <memory>
 
 class ControllerPublisher : public rclcpp::Node {
 public:

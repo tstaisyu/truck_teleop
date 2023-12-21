@@ -6,6 +6,8 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <memory>
+using std::placeholders::_1;
 
 #define bottom 50
 #define R 12
@@ -39,7 +41,7 @@ public:
         RCLCPP_INFO(this->get_logger(), "GPIO set up completed.");
 
         subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
-            "velocity", rclcpp::SystemDefaultsQoS(), std::bind(&SubscriberNode::ToGpio, this, std::placeholders::_1));
+            "velocity", rclcpp::SystemDefaultsQoS(), std::bind(&SubscriberNode::ToGpio, this, _1));
         RCLCPP_INFO(this->get_logger(), "Subscription created successfully.");
     }
 
@@ -48,7 +50,7 @@ public:
     }
 
 private:
-    void ToGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
+    void ToGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg) const
     {
         RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
 
