@@ -80,11 +80,6 @@ private:
 int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
-
-    // ロガーレベルを DEBUG または INFO に設定
-    auto node_logger = rclcpp::get_logger("SubscriberNode");
-    rclcpp::Logger::set_logger_level(node_logger.get_name(), rclcpp::Logger::Level::Debug);
-
     try {
         auto node = std::make_shared<SubscriberNode>();
         rclcpp::spin(node);
