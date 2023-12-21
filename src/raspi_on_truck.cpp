@@ -20,7 +20,7 @@ public:
     {
     int initResult = gpioInitialise();
     if (initResult < 0) {
-        RCLCPP_FATAL(this->get_logger(), "Failed to initialize GPIO: %d", initResult);
+        RCLCPP_FATAL(this->get_logger(), "Failed to initialize GPIO. Returned -1. Make sure pigpiod is running.");
         rclcpp::shutdown();
         throw std::runtime_error("Failed to initialize GPIO");
     }
