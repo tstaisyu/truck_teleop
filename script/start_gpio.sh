@@ -1,4 +1,5 @@
 #!/bin/bash
 source /opt/ros/foxy/setup.bash
 source /home/ubuntu/ros2_ws/install/setup.bash
-ros2 run truck_teleop raspi_on_truck
+#ros2 run truck_teleop raspi_on_truck
+RCUTILS_CONSOLE_OUTPUT_FORMAT='[{severity}] [{name}]: {message}' RCUTILS_LOGGING_BUFFERED_STREAM=1 RCUTILS_LOG_MIN_SEVERITY=DEBUG ros2 run truck_teleop raspi_on_truck
