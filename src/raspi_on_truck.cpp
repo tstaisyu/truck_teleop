@@ -22,7 +22,7 @@ public:
     if (initResult < 0) {
         RCLCPP_ERROR(this->get_logger(), "Failed to initialize GPIO: %d", initResult);
         rclcpp::shutdown();
-        return;
+        throw std::runtime_error("Failed to initialize GPIO");
     }
 
         gpioSetMode(R, PI_OUTPUT);
@@ -58,9 +58,12 @@ private:
 int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<SubscriberNode>();
-    rclcpp::spin(node);
-    node = nullptr;
+    try {
+        auto node = std::make_shared<SubscriberNode>();
+        rclcpp::spin(node);
+    } catch (const std::runtime_error& e) {
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Exception: %s", e.what());
+    }
     rclcpp::shutdown();
     return 0;
 }
