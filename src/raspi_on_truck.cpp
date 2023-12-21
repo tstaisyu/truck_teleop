@@ -82,14 +82,14 @@ int main(int argc, char * argv[])
     rclcpp::init(argc, argv);
 
     // ロガーレベルを DEBUG または INFO に設定
-    auto logger = rclcpp::get_logger("SubscriberNode");
-    rclcpp::Logger::get_child("rclcpp").set_level(rclcpp::Logger::Level::Debug);
+    auto node_logger = rclcpp::get_logger("SubscriberNode");
+    rclcpp::Logger::set_logger_level(node_logger.get_name(), rclcpp::Logger::Level::Debug);
 
     try {
         auto node = std::make_shared<SubscriberNode>();
         rclcpp::spin(node);
     } catch (const std::runtime_error& e) {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Exception: %s", e.what());
+        RCLCPP_ERROR(node_logger, "Exception: %s", e.what());
     }
     rclcpp::shutdown();
     return 0;
