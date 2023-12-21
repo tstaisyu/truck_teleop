@@ -19,15 +19,13 @@ public:
     SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0)
     {
         RCLCPP_INFO(this->get_logger(), "Initializing pigpio library...");
-        int initResult = gpioInitialise();
-        if (initResult < 0) {
-            RCLCPP_ERROR(this->get_logger(), "Failed to initialize pigpio library: %d", initResult);
+        if (gpioInitialise() < 0) {
+            RCLCPP_ERROR(this->get_logger(), "Failed to initialize pigpio library");
             rclcpp::shutdown();
             throw std::runtime_error("Failed to initialize GPIO");
-        } else {
-            RCLCPP_INFO(this->get_logger(), "Successfully initialized pigpio library.");
         }
-    
+        RCLCPP_INFO(this->get_logger(), "Successfully initialized pigpio library.");
+
         gpioSetMode(R, PI_OUTPUT);
         gpioSetMode(L, PI_OUTPUT);
         gpioSetMode(ENABLE_r, PI_OUTPUT);
@@ -36,22 +34,13 @@ public:
         gpioWrite(ENABLE_r, PI_LOW);
         gpioWrite(ENABLE_l, PI_LOW);
 
-        // GPIO PWM setup code here
+        // GPIO PWM setup code here (if needed)
 
         RCLCPP_INFO(this->get_logger(), "GPIO set up completed.");
 
-        try {
-            subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
-                "velocity", rclcpp::QoS(10), std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
-            RCLCPP_INFO(this->get_logger(), "Subscription created successfully.");
-        } catch (const std::exception& e) {
-            RCLCPP_ERROR(this->get_logger(), "Subscription initialization failed: %s", e.what());
-            rclcpp::shutdown();
-            throw std::runtime_error("Failed to create subscription");
-        }
-
-//        subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
-//            "velocity", 10, std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
+        subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
+            "velocity", rclcpp::QoS(10), std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
+        RCLCPP_INFO(this->get_logger(), "Subscription created successfully.");
     }
 
     ~SubscriberNode() {
@@ -61,19 +50,20 @@ public:
 private:
     void toGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
     {
-        RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
-        if (msg == nullptr) {
-            RCLCPP_ERROR(this->get_logger(), "Received null pointer in callback");
+        if (!msg || msg->data.size() < 2) {
+            RCLCPP_ERROR(this->get_logger(), "Invalid joystick data received.");
             return;
         }
-        if (msg->data.size() >= 2) {
-            joy_r = msg->data[0];
-            joy_l = msg->data[1];
-        // GPIO操作のロジックをここに実装します
-            RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", joy_r, joy_l);
-        } else {
-            RCLCPP_ERROR(this->get_logger(), "Received joystick data is not valid.");
-        }
+
+        joy_r = msg->data[0];
+        joy_l = msg->data[1];
+
+        // Implement GPIO operations logic here
+        RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", joy_r, joy_l);
+        
+        // Example: Set GPIO pin values based on joystick input
+        // gpioPWM(R, joy_r); // Adjust as necessary
+        // gpioPWM(L, joy_l); // Adjust as necessary
     }
 
     rclcpp::Subscription<std_msgs::msg::Int32MultiArray>::SharedPtr subscription_;
@@ -83,13 +73,8 @@ private:
 int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
-
-    try {
-        auto node = std::make_shared<SubscriberNode>();
-        rclcpp::spin(node);
-    } catch (const std::runtime_error& e) {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Exception: %s", e.what());
-    }
+    auto node = std::make_shared<SubscriberNode>();
+    rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;
 }
