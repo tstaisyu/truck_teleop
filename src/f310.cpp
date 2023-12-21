@@ -1,6 +1,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/int32_multi_array.hpp>
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 class ControllerPublisher : public rclcpp::Node {
 public:
@@ -11,10 +11,19 @@ public:
             std::bind(&ControllerPublisher::timer_callback, this)
         );
 
-        SDL_Init(SDL_INIT_JOYSTICK);
-        joystick_ = SDL_JoystickOpen(0);
-        if (joystick_ == nullptr) {
-            RCLCPP_ERROR(this->get_logger(), "Joystick not found.");
+        if (SDL_Init(SDL_INIT_JOYSTICK) < 0) {
+            RCLCPP_ERROR(this->get_logger(), "SDL could not initialize! SDL Error: %s", SDL_GetError());
+        } else {
+            if (SDL_NumJoysticks() < 1) {
+                RCLCPP_ERROR(this->get_logger(), "No joysticks connected!");
+            } else {
+                joystick_ = SDL_JoystickOpen(0);
+                if (joystick_ == nullptr) {
+                    RCLCPP_ERROR(this->get_logger(), "Unable to open joystick: %s", SDL_GetError());
+                } else {
+                    RCLCPP_INFO(this->get_logger(), "Joystick opened successfully.");
+                }
+            }
         }
     }
 
@@ -27,21 +36,26 @@ public:
 
 private:
     void timer_callback() {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            // Handle events here if needed
-        }
-
-        std_msgs::msg::Int32MultiArray message;
+        // SDLのジョイスティックの状態を更新
+        SDL_JoystickUpdate();
         if (joystick_ != nullptr) {
-            int r_y = SDL_JoystickGetAxis(joystick_, 4) * -100;
-            int l_y = SDL_JoystickGetAxis(joystick_, 1) * -100;
+            int r_y = scaleAxis(SDL_JoystickGetAxis(joystick_, 4));
+            int l_y = scaleAxis(SDL_JoystickGetAxis(joystick_, 1));
+            std_msgs::msg::Int32MultiArray message;
             message.data = {r_y, l_y};
             RCLCPP_INFO(this->get_logger(), "Right : %d, Left : %d", r_y, l_y);
             publisher_->publish(message);
         }
     }
 
+    int scaleAxis(int value) {
+        // 軸の値を -100 から 100 の範囲にスケーリングする
+        // デッドゾーンも考慮する
+        const int DEAD_ZONE = 8000; // デッドゾーンの閾値
+        if (std::abs(value) < DEAD_ZONE) return 0;
+        return (value * 100) / 32768;
+    }
+    
     rclcpp::Publisher<std_msgs::msg::Int32MultiArray>::SharedPtr publisher_;
     rclcpp::TimerBase::SharedPtr timer_;
     SDL_Joystick* joystick_;
