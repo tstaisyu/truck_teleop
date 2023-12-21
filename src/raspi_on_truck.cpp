@@ -18,11 +18,14 @@ class SubscriberNode : public rclcpp::Node
 public:
     SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0)
     {
+    RCLCPP_INFO(this->get_logger(), "Initializing pigpio library...");
     int initResult = gpioInitialise();
     if (initResult < 0) {
-        RCLCPP_FATAL(this->get_logger(), "Failed to initialize GPIO. Returned -1. Make sure pigpiod is running.");
+        RCLCPP_ERROR(this->get_logger(), "Failed to initialize pigpio library: %d", initResult);
         rclcpp::shutdown();
         throw std::runtime_error("Failed to initialize GPIO");
+    } else {
+        RCLCPP_INFO(this->get_logger(), "Successfully initialized pigpio library.");
     }
 
         gpioSetMode(R, PI_OUTPUT);
