@@ -49,6 +49,7 @@ public:
 private:
     void toGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
     {
+        RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
         RCLCPP_INFO(this->get_logger(), "Received message in toGpio callback.");
         if (msg->data.size() >= 2) {
             joy_r = msg->data[0];
