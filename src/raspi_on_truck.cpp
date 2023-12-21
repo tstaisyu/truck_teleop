@@ -41,9 +41,8 @@ public:
         RCLCPP_INFO(this->get_logger(), "GPIO set up completed.");
 
         try {
-            auto qos = rclcpp::QoS(rclcpp::SystemDefaultsQoS());
             subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
-                "velocity", qos, std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
+                "velocity", rclcpp::QoS(10), std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
             RCLCPP_INFO(this->get_logger(), "Subscription created successfully.");
         } catch (const std::exception& e) {
             RCLCPP_ERROR(this->get_logger(), "Subscription initialization failed: %s", e.what());

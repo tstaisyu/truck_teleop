@@ -5,7 +5,7 @@
 class ControllerPublisher : public rclcpp::Node {
 public:
     ControllerPublisher() : Node("controller_publisher") {
-        publisher_ = this->create_publisher<std_msgs::msg::Int32MultiArray>("velocity", 10);
+        publisher_ = this->create_publisher<std_msgs::msg::Int32MultiArray>("velocity", rclcpp::QoS(10));
         timer_ = this->create_wall_timer(
             std::chrono::milliseconds(100),
             std::bind(&ControllerPublisher::timer_callback, this)
