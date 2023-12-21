@@ -50,7 +50,7 @@ public:
     }
 
 private:
-    void ToGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg) const
+    void ToGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
     {
         RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
 
