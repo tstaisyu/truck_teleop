@@ -80,11 +80,12 @@ private:
 int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
+
     try {
         auto node = std::make_shared<SubscriberNode>();
         rclcpp::spin(node);
     } catch (const std::runtime_error& e) {
-        RCLCPP_ERROR(node_logger, "Exception: %s", e.what());
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Exception: %s", e.what());
     }
     rclcpp::shutdown();
     return 0;
