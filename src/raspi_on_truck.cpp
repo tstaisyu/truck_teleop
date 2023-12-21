@@ -82,8 +82,8 @@ int main(int argc, char * argv[])
     rclcpp::init(argc, argv);
 
     // ロガーレベルを DEBUG または INFO に設定
-    rclcpp::Logger logger = rclcpp::get_logger("SubscriberNode");
-    rclcpp::Logger::set_level(rclcpp::Logger::Level::Debug);
+    auto logger = rclcpp::get_logger("SubscriberNode");
+    rcutils_logging_set_logger_level(logger.get_name(), RCUTILS_LOG_SEVERITY_DEBUG);
 
     try {
         auto node = std::make_shared<SubscriberNode>();
