@@ -22,7 +22,7 @@ public:
         if (gpioInitialise() < 0) {
             RCLCPP_ERROR(this->get_logger(), "Failed to initialize pigpio library");
             rclcpp::shutdown();
-            throw std::runtime_error("Failed to initialize GPIO");
+            return;
         }
         RCLCPP_INFO(this->get_logger(), "Successfully initialized pigpio library.");
 
@@ -76,12 +76,10 @@ private:
     int joy_r, joy_l;
 };
 
-std::shared_ptr<SubscriberNode> node = nullptr;
-
 int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
-    node = std::make_shared<SubscriberNode>();
+    auto node = std::make_shared<SubscriberNode>();
     rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;
