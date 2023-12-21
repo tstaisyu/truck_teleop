@@ -49,20 +49,7 @@ public:
 private:
     void toGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
     {
-        if (msg == nullptr) {
-            RCLCPP_ERROR(this->get_logger(), "Received null pointer in callback");
-            return;
-        }
         RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
-        RCLCPP_INFO(this->get_logger(), "Received message in toGpio callback.");
-        if (msg->data.size() >= 2) {
-            joy_r = msg->data[0];
-            joy_l = msg->data[1];
-        // GPIO操作のロジックをここに実装します
-            RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", joy_r, joy_l);
-        } else {
-            RCLCPP_ERROR(this->get_logger(), "Received joystick data is not valid.");
-        }
     }
 
     rclcpp::Subscription<std_msgs::msg::Int32MultiArray>::SharedPtr subscription_;
