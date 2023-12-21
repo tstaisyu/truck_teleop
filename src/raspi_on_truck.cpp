@@ -18,10 +18,12 @@ class SubscriberNode : public rclcpp::Node
 public:
     SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0)
     {
-        if (gpioInitialise() < 0) {
-            RCLCPP_ERROR(this->get_logger(), "Failed to initialize GPIO");
-            rclcpp::shutdown();
-        }
+    int initResult = gpioInitialise();
+    if (initResult < 0) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to initialize GPIO: %d", initResult);
+        rclcpp::shutdown();
+        return;
+    }
 
         gpioSetMode(R, PI_OUTPUT);
         gpioSetMode(L, PI_OUTPUT);
@@ -34,7 +36,7 @@ public:
         // GPIO PWM setup code here
 
         subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
-            "verocity", 10, std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
+            "velocity", 10, std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
     }
 
     ~SubscriberNode() {
