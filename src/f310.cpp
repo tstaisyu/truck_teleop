@@ -13,6 +13,8 @@ public:
 
         if (SDL_Init(SDL_INIT_JOYSTICK) < 0) {
             RCLCPP_ERROR(this->get_logger(), "SDL could not initialize! SDL Error: %s", SDL_GetError());
+            rclcpp::shutdown();
+            throw std::runtime_error("Failed to initialize SDL");
         } else {
             if (SDL_NumJoysticks() < 1) {
                 RCLCPP_ERROR(this->get_logger(), "No joysticks connected!");
