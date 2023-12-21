@@ -62,11 +62,11 @@ public:
 private:
     void toGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
     {
+        RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
         if (msg == nullptr) {
             RCLCPP_ERROR(this->get_logger(), "Received null pointer in callback");
             return;
         }
-        RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
         if (msg->data.size() >= 2) {
             joy_r = msg->data[0];
             joy_l = msg->data[1];
