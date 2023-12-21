@@ -24,9 +24,9 @@ public:
             RCLCPP_ERROR(this->get_logger(), "Failed to initialize pigpio library: %d", initResult);
             rclcpp::shutdown();
             throw std::runtime_error("Failed to initialize GPIO");
+        } else {
+            RCLCPP_INFO(this->get_logger(), "Successfully initialized pigpio library.");
         }
-
-        RCLCPP_INFO(this->get_logger(), "Successfully initialized pigpio library.");
     
         gpioSetMode(R, PI_OUTPUT);
         gpioSetMode(L, PI_OUTPUT);
@@ -41,11 +41,14 @@ public:
         RCLCPP_INFO(this->get_logger(), "GPIO set up completed.");
 
         try {
+            auto qos = rclcpp::QoS(rclcpp::SystemDefaultsQoS());
             subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
-                "velocity", 10, std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
+                "velocity", qos, std::bind(&SubscriberNode::toGpio, this, std::placeholders::_1));
+            RCLCPP_INFO(this->get_logger(), "Subscription created successfully.");
         } catch (const std::exception& e) {
             RCLCPP_ERROR(this->get_logger(), "Subscription initialization failed: %s", e.what());
             rclcpp::shutdown();
+            throw std::runtime_error("Failed to create subscription");
         }
 
 //        subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
@@ -64,7 +67,6 @@ private:
             return;
         }
         RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
-        RCLCPP_INFO(this->get_logger(), "Received message in toGpio callback.");
         if (msg->data.size() >= 2) {
             joy_r = msg->data[0];
             joy_l = msg->data[1];
