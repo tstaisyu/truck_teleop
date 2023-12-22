@@ -42,7 +42,7 @@ private:
         // SDLのジョイスティックの状態を更新
         SDL_JoystickUpdate();
         if (joystick_ != nullptr) {
-            int r_y = scaleAxis(SDL_JoystickGetAxis(joystick_, 4));
+            int r_y = scaleAxis(SDL_JoystickGetAxis(joystick_, 3));
             int l_y = scaleAxis(SDL_JoystickGetAxis(joystick_, 1));
             std_msgs::msg::Int32MultiArray message;
             message.data = {r_y, l_y};

@@ -18,7 +18,7 @@ using std::placeholders::_1;
 class SubscriberNode : public rclcpp::Node 
 {
 public:
-    SubscriberNode() : Node("subscriber")
+    SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0)
     {
         RCLCPP_INFO(this->get_logger(), "Initializing pigpio library...");
         if (gpioInitialise() < 0) {
