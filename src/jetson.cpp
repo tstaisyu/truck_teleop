@@ -31,8 +31,8 @@ public:
         GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
 
         // PWM制御のためのスレッドを開始
-        pwm_thread_r = std::thread([this] { pwm_loop(R, joy_r); });
-        pwm_thread_l = std::thread([this] { pwm_loop(L, joy_l); });
+        pwm_thread_r = std::thread([this] { pwm_loop(R, &joy_r); });
+        pwm_thread_l = std::thread([this] { pwm_loop(L, &joy_l); });
 
 
         RCLCPP_INFO(this->get_logger(), "GPIO setup completed.");
@@ -52,15 +52,15 @@ public:
     }
 
 private:
-    void pwm_loop(int pin, std::atomic<int>& duty_cycle) {
+    void pwm_loop(int pin, std::atomic<int>* duty_cycle) {
         while (running) {
-            if (duty_cycle > 0) {
+            if ((*duty_cycle) > 0) {
                 GPIO::output(pin, GPIO::HIGH);
-                std::this_thread::sleep_for(std::chrono::milliseconds(duty_cycle));
+                std::this_thread::sleep_for(std::chrono::milliseconds((*duty_cycle)));
             }
-            if (duty_cycle < 100) {
+            if ((*duty_cycle) < 100) {
                 GPIO::output(pin, GPIO::LOW);
-                std::this_thread::sleep_for(std::chrono::milliseconds(100 - duty_cycle));
+                std::this_thread::sleep_for(std::chrono::milliseconds(100 - (*duty_cycle)));
             }
         }
     }
