@@ -10,10 +10,10 @@
 #include <atomic>
 using std::placeholders::_1;
 
-#define R 12
-#define L 13
+#define R 27
+#define L 35
 #define ENABLE_r 17
-#define ENABLE_l 18
+#define ENABLE_l 32
 
 class SubscriberNode : public rclcpp::Node 
 {
