@@ -2,6 +2,8 @@
 
 This is a package for  truck control using joysticks.
 
+![NeuraTruck system conf](image/system_conf_1223.png)
+
 # Requirement
 
 Ubuntu 22.04
