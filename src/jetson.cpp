@@ -7,6 +7,7 @@
 #include <chrono>
 #include <thread>
 #include <memory>
+#include <atomic>
 using std::placeholders::_1;
 
 #define R 12
@@ -29,6 +30,10 @@ public:
         GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
         GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
 
+        // PWM制御のためのスレッドを開始
+        pwm_thread_r = std::thread(&SubscriberNode::pwm_loop, this, R, std::ref(joy_r));
+        pwm_thread_l = std::thread(&SubscriberNode::pwm_loop, this, L, std::ref(joy_l));
+
         RCLCPP_INFO(this->get_logger(), "GPIO setup completed.");
 
         subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
@@ -37,10 +42,28 @@ public:
     }
 
     ~SubscriberNode() {
+        // PWMスレッドの停止
+        running = false;
+        if (pwm_thread_r.joinable()) pwm_thread_r.join();
+        if (pwm_thread_l.joinable()) pwm_thread_l.join();
+
         GPIO::cleanup(); // Clean up GPIO library
     }
 
 private:
+    void pwm_loop(int pin, std::atomic<int>& duty_cycle) {
+        while (running) {
+            if (duty_cycle > 0) {
+                GPIO::output(pin, GPIO::HIGH);
+                std::this_thread::sleep_for(std::chrono::milliseconds(duty_cycle));
+            }
+            if (duty_cycle < 100) {
+                GPIO::output(pin, GPIO::LOW);
+                std::this_thread::sleep_for(std::chrono::milliseconds(100 - duty_cycle));
+            }
+        }
+    }
+
     void ToGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
     {
         RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
@@ -59,17 +82,12 @@ private:
         joy_l = msg->data[1];
         RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", joy_r, joy_l);
 
-        // PWM制御
-        GPIO::output(ENABLE_r, GPIO::HIGH); // 例：モーターの方向制御
-        GPIO::output(ENABLE_l, GPIO::HIGH);
-        GPIO::softPWMCreate(R, 0, 100); // PWM範囲の設定（0-100）
-        GPIO::softPWMCreate(L, 0, 100);
-        GPIO::softPWMWrite(R, joy_r); // PWM制御
-        GPIO::softPWMWrite(L, joy_l);
     }
 
     rclcpp::Subscription<std_msgs::msg::Int32MultiArray>::SharedPtr subscription_;
     int joy_r, joy_l;
+    std::thread pwm_thread_r, pwm_thread_l;
+    std::atomic<bool> running;
 };
 
 int main(int argc, char * argv[])
