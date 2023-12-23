@@ -2,14 +2,13 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/int32_multi_array.hpp>
-#include <pigpio.h>
+#include <JetsonGPIO.h>
 #include <iostream>
 #include <chrono>
 #include <thread>
 #include <memory>
 using std::placeholders::_1;
 
-#define bottom 50
 #define R 12
 #define L 13
 #define ENABLE_r 17
@@ -20,25 +19,17 @@ class SubscriberNode : public rclcpp::Node
 public:
     SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0)
     {
-        RCLCPP_INFO(this->get_logger(), "Initializing pigpio library...");
-        if (gpioInitialise() < 0) {
-            RCLCPP_ERROR(this->get_logger(), "Failed to initialize pigpio library");
-            rclcpp::shutdown();
-            return;
-        }
-        RCLCPP_INFO(this->get_logger(), "Successfully initialized pigpio library.");
+        RCLCPP_INFO(this->get_logger(), "Setting up GPIO using JetsonGPIO...");
+        
+        // JetsonGPIOを設定
+        GPIO::setmode(GPIO::BCM);
+        
+        GPIO::setup(R, GPIO::OUT, GPIO::LOW);
+        GPIO::setup(L, GPIO::OUT, GPIO::LOW);
+        GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
+        GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
 
-        gpioSetMode(R, PI_OUTPUT);
-        gpioSetMode(L, PI_OUTPUT);
-        gpioSetMode(ENABLE_r, PI_OUTPUT);
-        gpioSetMode(ENABLE_l, PI_OUTPUT);
-
-        gpioWrite(ENABLE_r, PI_LOW);
-        gpioWrite(ENABLE_l, PI_LOW);
-
-        // GPIO PWM setup code here (if needed)
-
-        RCLCPP_INFO(this->get_logger(), "GPIO set up completed.");
+        RCLCPP_INFO(this->get_logger(), "GPIO setup completed.");
 
         subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
             "velocity", rclcpp::SystemDefaultsQoS(), std::bind(&SubscriberNode::ToGpio, this, _1));
@@ -46,7 +37,7 @@ public:
     }
 
     ~SubscriberNode() {
-        gpioTerminate(); // Clean up pigpio library
+        GPIO::cleanup(); // Clean up GPIO library
     }
 
 private:
@@ -68,10 +59,13 @@ private:
         joy_l = msg->data[1];
         RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", joy_r, joy_l);
 
-        // Implement GPIO operations logic here
-        // Example: Adjust the PWM values based on joystick input
-        // gpioPWM(R, joy_r); // Adjust as necessary
-        // gpioPWM(L, joy_l); // Adjust as necessary
+        // PWM制御
+        GPIO::output(ENABLE_r, GPIO::HIGH); // 例：モーターの方向制御
+        GPIO::output(ENABLE_l, GPIO::HIGH);
+        GPIO::softPWMCreate(R, 0, 100); // PWM範囲の設定（0-100）
+        GPIO::softPWMCreate(L, 0, 100);
+        GPIO::softPWMWrite(R, joy_r); // PWM制御
+        GPIO::softPWMWrite(L, joy_l);
     }
 
     rclcpp::Subscription<std_msgs::msg::Int32MultiArray>::SharedPtr subscription_;
