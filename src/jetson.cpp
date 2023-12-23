@@ -86,7 +86,7 @@ private:
         int right_joystick = joy_r.load();
         int left_joystick = joy_l.load();
 
-        RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", joy_r, joy_l);
+        RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", right_joystick, left_joystick);
 
     }
 
