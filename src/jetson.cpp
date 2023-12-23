@@ -31,8 +31,8 @@ public:
         GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
 
         // PWM制御のためのスレッドを開始
-        pwm_thread_r = std::thread([this] { pwm_loop(R, std::ref(joy_r).get()); });
-        pwm_thread_l = std::thread([this] { pwm_loop(L, std::ref(joy_l).get()); });
+        pwm_thread_r = std::thread([this] { pwm_loop(R, joy_r); });
+        pwm_thread_l = std::thread([this] { pwm_loop(L, joy_l); });
 
 
         RCLCPP_INFO(this->get_logger(), "GPIO setup completed.");
