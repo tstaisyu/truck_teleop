@@ -18,7 +18,7 @@ using std::placeholders::_1;
 class SubscriberNode : public rclcpp::Node 
 {
 public:
-    SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0)
+    SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0), running(true)
     {
         RCLCPP_INFO(this->get_logger(), "Setting up GPIO using JetsonGPIO...");
         
@@ -31,8 +31,9 @@ public:
         GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
 
         // PWM制御のためのスレッドを開始
-        pwm_thread_r = std::thread(&SubscriberNode::pwm_loop, this, R, std::ref(joy_r));
-        pwm_thread_l = std::thread(&SubscriberNode::pwm_loop, this, L, std::ref(joy_l));
+        pwm_thread_r = std::thread([this] { pwm_loop(R, std::ref(joy_r)); });
+        pwm_thread_l = std::thread([this] { pwm_loop(L, std::ref(joy_l)); });
+
 
         RCLCPP_INFO(this->get_logger(), "GPIO setup completed.");
 
