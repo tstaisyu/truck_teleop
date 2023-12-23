@@ -13,7 +13,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(SDL REQUIRED)
-find_package(pigpio REQUIRED)
+find_package(JetsonGPIO REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -28,7 +28,7 @@ if(BUILD_TESTING)
 endif()
 
 add_executable(jetson src/jetson.cpp)
-ament_target_dependencies(jetson rclcpp std_msgs pigpio)
+ament_target_dependencies(jetson rclcpp std_msgs JetsonGPIO)
 #add_executable(f310 src/f310.cpp)
 #ament_target_dependencies(f310 rclcpp std_msgs SDL)
 
@@ -36,7 +36,7 @@ target_compile_options(jetson
   PUBLIC -Wall -pthread
 )
 target_link_libraries(jetson
-  pigpio
+  JetsonGPIO
 )
 
 install(TARGETS
