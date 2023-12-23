@@ -10,8 +10,8 @@
 #include <atomic>
 using std::placeholders::_1;
 
-#define R 27
-#define L 35
+#define R 15
+#define L 18
 #define ENABLE_r 17
 #define ENABLE_l 32
 
