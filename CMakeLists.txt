@@ -13,6 +13,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(SDL REQUIRED)
+find_package(pigpio REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -26,20 +27,20 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_executable(raspi_on_truck src/raspi_on_truck.cpp)
-ament_target_dependencies(raspi_on_truck rclcpp std_msgs)
+add_executable(jetson src/jetson.cpp)
+ament_target_dependencies(jetson rclcpp std_msgs pigpio)
 #add_executable(f310 src/f310.cpp)
 #ament_target_dependencies(f310 rclcpp std_msgs SDL)
 
-target_compile_options(raspi_on_truck
+target_compile_options(jetson
   PUBLIC -Wall -pthread
 )
-target_link_libraries(raspi_on_truck
+target_link_libraries(jetson
   pigpio
 )
 
 install(TARGETS
-  raspi_on_truck
+  jetson
 #  f310
   DESTINATION lib/${PROJECT_NAME})
 
