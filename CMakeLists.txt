@@ -28,7 +28,7 @@ if(BUILD_TESTING)
 endif()
 
 add_executable(jetson src/jetson.cpp)
-ament_target_dependencies(jetson rclcpp std_msgs JetsonGPIO::JetsonGPIO)
+ament_target_dependencies(jetson rclcpp std_msgs JetsonGPIO)
 #add_executable(f310 src/f310.cpp)
 #ament_target_dependencies(f310 rclcpp std_msgs SDL)
 
