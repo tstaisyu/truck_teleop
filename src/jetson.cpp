@@ -81,6 +81,11 @@ private:
 
         joy_r = msg->data[0];
         joy_l = msg->data[1];
+
+        // std::atomic<int> オブジェクトから値を読み取る
+        int right_joystick = joy_r.load();
+        int left_joystick = joy_l.load();
+
         RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", joy_r, joy_l);
 
     }
