@@ -86,7 +86,7 @@ private:
     }
 
     rclcpp::Subscription<std_msgs::msg::Int32MultiArray>::SharedPtr subscription_;
-    int joy_r, joy_l;
+    std::atomic<int> joy_r, joy_l;
     std::thread pwm_thread_r, pwm_thread_l;
     std::atomic<bool> running;
 };
