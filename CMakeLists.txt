@@ -36,7 +36,7 @@ target_compile_options(jetson
   PUBLIC -Wall -pthread
 )
 target_link_libraries(jetson
-  JetsonGPIO
+  JetsonGPIO::JetsonGPIO
 )
 
 install(TARGETS
