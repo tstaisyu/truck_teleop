@@ -40,8 +40,7 @@ target_link_libraries(jetson
 )
 
 install(TARGETS
-  jetson
-#  f310
-  DESTINATION lib/${PROJECT_NAME})
+  launch
+  DESTINATION share/${PROJECT_NAME})
 
 ament_package()
