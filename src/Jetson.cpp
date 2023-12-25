@@ -23,7 +23,7 @@ public:
         RCLCPP_INFO(this->get_logger(), "Setting up GPIO using JetsonGPIO...");
         
         // JetsonGPIOを設定
-        GPIO::setmode(GPIO::BCM);
+        GPIO::setmode(GPIO::BOARD);
         
         GPIO::setup(R, GPIO::OUT, GPIO::LOW);
         GPIO::setup(L, GPIO::OUT, GPIO::LOW);
