@@ -40,6 +40,11 @@ target_link_libraries(Jetson
 )
 
 install(TARGETS
+  JoyStick
+  Jetson
+  DESTINATION lib/${PROJECT_NAME})
+
+install(DIRECTORY
   launch
   DESTINATION share/${PROJECT_NAME})
 
