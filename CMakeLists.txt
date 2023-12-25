@@ -28,7 +28,7 @@ if(BUILD_TESTING)
 endif()
 
 add_executable(Jetson src/Jetson.cpp)
-ament_target_dependencies(jetson rclcpp std_msgs JetsonGPIO)
+ament_target_dependencies(Jetson rclcpp std_msgs JetsonGPIO)
 add_executable(JoyStick src/JoyStick.cpp)
 ament_target_dependencies(JoyStick rclcpp std_msgs SDL)
 
