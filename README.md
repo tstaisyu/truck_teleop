@@ -4,8 +4,9 @@ This is a package for  truck control using joysticks.
 
 ![NeuraTruck system conf](image/system_conf_1223.png)
 
-# Requirement
+# Development Environment & Requirement
 
+Jetson AGX Orin
 Ubuntu 22.04
 ROS2 Humble 22.04
 
