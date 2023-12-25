@@ -45,21 +45,15 @@ sudo start_gpio.sh
 ## teleop
 
 ```bash
-ros2 launch truck_teleop teleop
-```
-
-## self-driving
-
-```bash
-ros2 launch truck_teleop autonomous
+ros2 launch truck_teleop truck_teleop_launch.py
 ```
 
 # Hardware
 
-Board PC: Jetson nano
+Board PC: Jetson AGX Orin
 Controller: f710  
 Motor Driver: Cytron MDDS30
-LiDAR: 
+
 
 
 

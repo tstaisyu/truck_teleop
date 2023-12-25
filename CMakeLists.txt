@@ -27,15 +27,15 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_executable(jetson src/jetson.cpp)
+add_executable(Jetson src/Jetson.cpp)
 ament_target_dependencies(jetson rclcpp std_msgs JetsonGPIO)
-#add_executable(f310 src/f310.cpp)
-#ament_target_dependencies(f310 rclcpp std_msgs SDL)
+add_executable(JoyStick src/JoyStick.cpp)
+ament_target_dependencies(JoyStick rclcpp std_msgs SDL)
 
-target_compile_options(jetson
+target_compile_options(Jetson
   PUBLIC -Wall -pthread
 )
-target_link_libraries(jetson
+target_link_libraries(Jetson
   JetsonGPIO::JetsonGPIO
 )
 

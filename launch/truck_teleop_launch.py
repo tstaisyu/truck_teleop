@@ -8,12 +8,12 @@ def generate_launch_description():
 
     node1 = Node(
         package=pkg_name1,
-        executable='f310'
+        executable='JoyStick'
     )
 
     node2 = Node(
         package=pkg_name1,
-        executable='jetson'
+        executable='Jetson'
     )
 
     ld.add_action(node1)
