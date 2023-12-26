@@ -54,6 +54,9 @@ public:
 private:
     void pwm_loop(int pin, std::atomic<int>* duty_cycle) {
         while (running) {
+            // デバッグ出力を追加
+            std::cout << "PWM Loop running for pin " << pin << std::endl;
+            std::cout << "Duty Cycle: " << duty_cycle->load() << std::endl;
             if ((*duty_cycle) > 0) {
                 GPIO::output(pin, GPIO::HIGH);
                 std::this_thread::sleep_for(std::chrono::milliseconds((*duty_cycle)));
