@@ -22,7 +22,6 @@ public:
     {
 
         // JetsonGPIOを設定
-        GPIO::setmode(GPIO::BOARD);       
         GPIO::setup(R, GPIO::OUT, GPIO::LOW);
         GPIO::setup(L, GPIO::OUT, GPIO::LOW);
         GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
@@ -44,7 +43,6 @@ public:
     ~SubscriberNode() {
         PWM_R.stop();
         PWM_L.stop();
-        GPIO::cleanup(); // Clean up GPIO library
     }
 
 private:
@@ -83,9 +81,11 @@ private:
 
 int main(int argc, char * argv[])
 {
+    GPIO::setmode(GPIO::BOARD);     
     rclcpp::init(argc, argv);
     auto node = std::make_shared<SubscriberNode>();
     rclcpp::spin(node);
     rclcpp::shutdown();
+    GPIO::cleanup(); // Clean up GPIO library
     return 0;
 }
