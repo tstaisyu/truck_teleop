@@ -15,11 +15,11 @@ using std::placeholders::_1;
 #define ENABLE_r 13
 #define ENABLE_l 16
 
-inline void delay(double s) { this_thread::sleep_for(std::chrono::duration<double>(s)); }
+inline void delay(double s) { std::this_thread::sleep_for(std::chrono::duration<double>(s)); }
 
 static bool end_this_program = false;
 
-void signalHandler(int s) { end_this_program = true; }
+void signalHandler(int /*s*/) { end_this_program = true; }
 
 class SubscriberNode : public rclcpp::Node 
 {
