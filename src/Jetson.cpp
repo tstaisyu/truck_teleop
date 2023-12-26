@@ -10,9 +10,9 @@
 #include <JetsonGPIO.h>
 using std::placeholders::_1;
 
-#define R 15
+//#define R 15
 #define L 18
-#define ENABLE_r 13
+//#define ENABLE_r 13
 #define ENABLE_l 16
 
 inline void delay(double s) { std::this_thread::sleep_for(std::chrono::duration<double>(s)); }
@@ -24,8 +24,20 @@ void signalHandler(int /*s*/) { end_this_program = true; }
 class SubscriberNode : public rclcpp::Node 
 {
 public:
-    SubscriberNode() : Node("subscriber"), PWM_R(R, 50), PWM_L(L, 50), joy_r(0), joy_l(0)
+    SubscriberNode() : Node("subscriber"), /*PWM_R(R, 50), */PWM_L(L, 50)/*, joy_r(0)*/, joy_l(0)
     {
+
+        // JetsonGPIOを設定
+//        GPIO::setup(R, GPIO::OUT, GPIO::LOW);
+        GPIO::setup(L, GPIO::OUT, GPIO::LOW);
+//        GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
+        GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
+
+//        PWM_R = GPIO::PWM(R, 50);
+//        PWM_L = GPIO::PWM(L, 50);
+        auto val = 25.0;
+//        PWM_R.start(val);
+        PWM_L.start(val);
 
         RCLCPP_INFO(this->get_logger(), "GPIO setup completed.");
 
@@ -35,7 +47,7 @@ public:
     }
 
     ~SubscriberNode() {
-        PWM_R.stop();
+//        PWM_R.stop();
         PWM_L.stop();
     }
 
@@ -55,20 +67,20 @@ private:
             return;
         }
 
-        joy_r = msg->data[0];
+//        joy_r = msg->data[0];
         joy_l = msg->data[1];
 
-        PWM_R.ChangeDutyCycle(joy_r);
+//        PWM_R.ChangeDutyCycle(joy_r);
         PWM_L.ChangeDutyCycle(joy_l);
         
-        RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", joy_r, joy_l);
+//        RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", joy_r, joy_l);
 
     }
 
     // メンバ変数
-    GPIO::PWM PWM_R;
+//    GPIO::PWM PWM_R;
     GPIO::PWM PWM_L;
-    int joy_r;
+//    int joy_r;
     int joy_l;
     rclcpp::Subscription<std_msgs::msg::Int32MultiArray>::SharedPtr subscription_;
 
@@ -77,17 +89,6 @@ private:
 int main(int argc, char * argv[])
 {
     GPIO::setmode(GPIO::BOARD);     
-        // JetsonGPIOを設定
-        GPIO::setup(R, GPIO::OUT, GPIO::LOW);
-        GPIO::setup(L, GPIO::OUT, GPIO::LOW);
-        GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
-        GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
-
-        PWM_R = GPIO::PWM(R, 50);
-        PWM_L = GPIO::PWM(L, 50);
-        auto val = 25.0;
-        PWM_R.start(val);
-        PWM_L.start(val);
     rclcpp::init(argc, argv);
     auto node = std::make_shared<SubscriberNode>();
     rclcpp::spin(node);
