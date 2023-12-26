@@ -18,7 +18,7 @@ using std::placeholders::_1;
 class SubscriberNode : public rclcpp::Node 
 {
 public:
-    SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0), PWM_R(R, 50), PWM_L(L, 50)
+    SubscriberNode() : Node("subscriber"), PWM_R(R, 50), PWM_L(L, 50), joy_r(0), joy_l(0)
     {
 
         // JetsonGPIOを設定
