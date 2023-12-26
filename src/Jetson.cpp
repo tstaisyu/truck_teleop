@@ -12,29 +12,26 @@ using std::placeholders::_1;
 
 #define R 15
 #define L 18
-#define ENABLE_r 22
-#define ENABLE_l 13
+#define ENABLE_r 13
+#define ENABLE_l 16
+
+// JetsonGPIOを設定
+GPIO::setmode(GPIO::BOARD);       
+GPIO::setup(R, GPIO::OUT, GPIO::LOW);
+GPIO::setup(L, GPIO::OUT, GPIO::LOW);
+GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
+GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
+GPIO::PWM PWM_R(R, 50)
+GPIO::PWM PWM_L(L, 50)
+auto val = 25.0;
+PWM_R.start(val)
+PWM_L.start(val)
 
 class SubscriberNode : public rclcpp::Node 
 {
 public:
     SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0), running(true)
     {
-        RCLCPP_INFO(this->get_logger(), "Setting up GPIO using JetsonGPIO...");
-        
-        // JetsonGPIOを設定
-        GPIO::setmode(GPIO::BOARD);
-        
-        GPIO::setup(R, GPIO::OUT, GPIO::LOW);
-        GPIO::setup(L, GPIO::OUT, GPIO::LOW);
-        GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
-        GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
-
-        // PWM制御のためのスレッドを開始
-        pwm_thread_r = std::thread([this] { pwm_loop(R, &joy_r); });
-        pwm_thread_l = std::thread([this] { pwm_loop(L, &joy_l); });
-
-
         RCLCPP_INFO(this->get_logger(), "GPIO setup completed.");
 
         subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
@@ -43,46 +40,12 @@ public:
     }
 
     ~SubscriberNode() {
-        // PWMスレッドの停止
-        running = false;
-        if (pwm_thread_r.joinable()) pwm_thread_r.join();
-        if (pwm_thread_l.joinable()) pwm_thread_l.join();
-
+        PWM_R.stop()
+        PWM_L.stop()
         GPIO::cleanup(); // Clean up GPIO library
     }
 
 private:
-    void pwm_loop(int pin, std::atomic<int>* duty_cycle) {
-        static int last_duty_cycle = -1; // 最後のデューティサイクルの値を記録
-        while (running) {
-
-            int current_duty_cycle = duty_cycle->load();
-
-            // デューティサイクルの値を0～100の範囲に制限
-            if (current_duty_cycle < 0) {
-                current_duty_cycle = 0;
-            } else if (current_duty_cycle > 100) {
-                current_duty_cycle = 100;
-            }
-
-            // デューティサイクルの値が変わった場合のみデバッグ出力
-            if (current_duty_cycle != last_duty_cycle) {
-                std::cout << "PWM Loop running for pin " << pin << std::endl;
-                std::cout << "Duty Cycle: " << current_duty_cycle << std::endl;
-                last_duty_cycle = current_duty_cycle;
-            }
-
-            if ((*duty_cycle) > 0) {
-                GPIO::output(pin, GPIO::HIGH);
-                std::this_thread::sleep_for(std::chrono::milliseconds(current_duty_cycle));
-            }
-            if ((*duty_cycle) < 100) {
-                GPIO::output(pin, GPIO::LOW);
-                std::this_thread::sleep_for(std::chrono::milliseconds(100 - current_duty_cycle));
-            }
-        }
-    }
-
     void ToGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
     {
         RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
@@ -97,21 +60,18 @@ private:
             return;
         }
 
-        joy_r = msg->data[0];
-        joy_l = msg->data[1];
+        int joy_r = msg->data[0];
+        int joy_l = msg->data[1];
 
-        // std::atomic<int> オブジェクトから値を読み取る
-        int right_joystick = joy_r.load();
-        int left_joystick = joy_l.load();
-
+        PWM_R.ChangeDutyCycle(joy_r)
+        PWM_L.ChangeDutyCycle(joy_l)
+        
         RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", right_joystick, left_joystick);
 
     }
 
     rclcpp::Subscription<std_msgs::msg::Int32MultiArray>::SharedPtr subscription_;
-    std::atomic<int> joy_r, joy_l;
-    std::thread pwm_thread_r, pwm_thread_l;
-    std::atomic<bool> running;
+
 };
 
 int main(int argc, char * argv[])
