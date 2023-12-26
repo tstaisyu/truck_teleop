@@ -15,19 +15,6 @@ using std::placeholders::_1;
 #define ENABLE_r 13
 #define ENABLE_l 16
 
-
-
-class SubscriberNode : public rclcpp::Node 
-{
-public:
-    SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0), running(true)
-    {
-        RCLCPP_INFO(this->get_logger(), "GPIO setup completed.");
-
-        subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
-            "velocity", rclcpp::SystemDefaultsQoS(), std::bind(&SubscriberNode::ToGpio, this, _1));
-        RCLCPP_INFO(this->get_logger(), "Subscription created successfully.");
-
 // JetsonGPIOを設定
 GPIO::setmode(GPIO::BOARD);       
 GPIO::setup(R, GPIO::OUT, GPIO::LOW);
@@ -40,6 +27,16 @@ auto val = 25.0;
 PWM_R.start(val);
 PWM_L.start(val);
 
+class SubscriberNode : public rclcpp::Node 
+{
+public:
+    SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0), running(true)
+    {
+        RCLCPP_INFO(this->get_logger(), "GPIO setup completed.");
+
+        subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
+            "velocity", rclcpp::SystemDefaultsQoS(), std::bind(&SubscriberNode::ToGpio, this, _1));
+        RCLCPP_INFO(this->get_logger(), "Subscription created successfully.");
     }
 
     ~SubscriberNode() {
