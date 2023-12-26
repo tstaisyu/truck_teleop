@@ -53,17 +53,32 @@ public:
 
 private:
     void pwm_loop(int pin, std::atomic<int>* duty_cycle) {
+        static int last_duty_cycle = -1; // 最後のデューティサイクルの値を記録
         while (running) {
-            // デバッグ出力を追加
-            std::cout << "PWM Loop running for pin " << pin << std::endl;
-            std::cout << "Duty Cycle: " << duty_cycle->load() << std::endl;
+
+            int current_duty_cycle = duty_cycle->load();
+
+            // デューティサイクルの値を0～100の範囲に制限
+            if (current_duty_cycle < 0) {
+                current_duty_cycle = 0;
+            } else if (current_duty_cycle > 100) {
+                current_duty_cycle = 100;
+            }
+
+            // デューティサイクルの値が変わった場合のみデバッグ出力
+            if (current_duty_cycle != last_duty_cycle) {
+                std::cout << "PWM Loop running for pin " << pin << std::endl;
+                std::cout << "Duty Cycle: " << current_duty_cycle << std::endl;
+                last_duty_cycle = current_duty_cycle;
+            }
+
             if ((*duty_cycle) > 0) {
                 GPIO::output(pin, GPIO::HIGH);
-                std::this_thread::sleep_for(std::chrono::milliseconds((*duty_cycle)));
+                std::this_thread::sleep_for(std::chrono::milliseconds(current_duty_cycle));
             }
             if ((*duty_cycle) < 100) {
                 GPIO::output(pin, GPIO::LOW);
-                std::this_thread::sleep_for(std::chrono::milliseconds(100 - (*duty_cycle)));
+                std::this_thread::sleep_for(std::chrono::milliseconds(100 - current_duty_cycle));
             }
         }
     }
