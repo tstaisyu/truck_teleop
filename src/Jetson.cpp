@@ -18,7 +18,7 @@ using std::placeholders::_1;
 class SubscriberNode : public rclcpp::Node 
 {
 public:
-    SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0), running(true)
+    SubscriberNode() : Node("subscriber"), joy_r(0), joy_l(0), PWM_R(R, 50), PWM_L(L, 50)
     {
 
         // JetsonGPIOを設定
@@ -68,7 +68,7 @@ private:
         PWM_R.ChangeDutyCycle(joy_r);
         PWM_L.ChangeDutyCycle(joy_l);
         
-        RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", right_joystick, left_joystick);
+        RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", joy_r, joy_l);
 
     }
 
