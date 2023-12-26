@@ -2,18 +2,24 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/int32_multi_array.hpp>
-#include <JetsonGPIO.h>
 #include <iostream>
 #include <chrono>
+#include <string>
 #include <thread>
-#include <memory>
-#include <atomic>
+#include <signal.h>
+#include <JetsonGPIO.h>
 using std::placeholders::_1;
 
 #define R 15
 #define L 18
 #define ENABLE_r 13
 #define ENABLE_l 16
+
+inline void delay(double s) { this_thread::sleep_for(std::chrono::duration<double>(s)); }
+
+static bool end_this_program = false;
+
+void signalHandler(int s) { end_this_program = true; }
 
 class SubscriberNode : public rclcpp::Node 
 {
@@ -48,6 +54,7 @@ public:
 private:
     void ToGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
     {
+        delay(0.25);
         RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
 
         if (!msg) {
