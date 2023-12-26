@@ -15,17 +15,7 @@ using std::placeholders::_1;
 #define ENABLE_r 13
 #define ENABLE_l 16
 
-// JetsonGPIOを設定
-GPIO::setmode(GPIO::BOARD);       
-GPIO::setup(R, GPIO::OUT, GPIO::LOW);
-GPIO::setup(L, GPIO::OUT, GPIO::LOW);
-GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
-GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
-GPIO::PWM PWM_R(R, 50)
-GPIO::PWM PWM_L(L, 50)
-auto val = 25.0;
-PWM_R.start(val)
-PWM_L.start(val)
+
 
 class SubscriberNode : public rclcpp::Node 
 {
@@ -37,11 +27,24 @@ public:
         subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
             "velocity", rclcpp::SystemDefaultsQoS(), std::bind(&SubscriberNode::ToGpio, this, _1));
         RCLCPP_INFO(this->get_logger(), "Subscription created successfully.");
+
+// JetsonGPIOを設定
+GPIO::setmode(GPIO::BOARD);       
+GPIO::setup(R, GPIO::OUT, GPIO::LOW);
+GPIO::setup(L, GPIO::OUT, GPIO::LOW);
+GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
+GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
+GPIO::PWM PWM_R(R, 50);
+GPIO::PWM PWM_L(L, 50);
+auto val = 25.0;
+PWM_R.start(val);
+PWM_L.start(val);
+
     }
 
     ~SubscriberNode() {
-        PWM_R.stop()
-        PWM_L.stop()
+        PWM_R.stop();
+        PWM_L.stop();
         GPIO::cleanup(); // Clean up GPIO library
     }
 
@@ -63,8 +66,8 @@ private:
         int joy_r = msg->data[0];
         int joy_l = msg->data[1];
 
-        PWM_R.ChangeDutyCycle(joy_r)
-        PWM_L.ChangeDutyCycle(joy_l)
+        PWM_R.ChangeDutyCycle(joy_r);
+        PWM_L.ChangeDutyCycle(joy_l);
         
         RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", right_joystick, left_joystick);
 
