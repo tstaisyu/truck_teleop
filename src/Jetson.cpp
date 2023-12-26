@@ -27,18 +27,6 @@ public:
     SubscriberNode() : Node("subscriber"), PWM_R(R, 50), PWM_L(L, 50), joy_r(0), joy_l(0)
     {
 
-        // JetsonGPIOを設定
-        GPIO::setup(R, GPIO::OUT, GPIO::LOW);
-        GPIO::setup(L, GPIO::OUT, GPIO::LOW);
-        GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
-        GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
-
-        PWM_R = GPIO::PWM(R, 50);
-        PWM_L = GPIO::PWM(L, 50);
-        auto val = 25.0;
-        PWM_R.start(val);
-        PWM_L.start(val);
-
         RCLCPP_INFO(this->get_logger(), "GPIO setup completed.");
 
         subscription_ = this->create_subscription<std_msgs::msg::Int32MultiArray>(
@@ -89,6 +77,17 @@ private:
 int main(int argc, char * argv[])
 {
     GPIO::setmode(GPIO::BOARD);     
+        // JetsonGPIOを設定
+        GPIO::setup(R, GPIO::OUT, GPIO::LOW);
+        GPIO::setup(L, GPIO::OUT, GPIO::LOW);
+        GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
+        GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
+
+        PWM_R = GPIO::PWM(R, 50);
+        PWM_L = GPIO::PWM(L, 50);
+        auto val = 25.0;
+        PWM_R.start(val);
+        PWM_L.start(val);
     rclcpp::init(argc, argv);
     auto node = std::make_shared<SubscriberNode>();
     rclcpp::spin(node);
