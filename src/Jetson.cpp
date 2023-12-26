@@ -54,7 +54,7 @@ public:
 private:
     void ToGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
     {
-        delay(0.25);
+        delay(0.05);
         RCLCPP_INFO(this->get_logger(), "toGpio callback called.");
 
         if (!msg) {
