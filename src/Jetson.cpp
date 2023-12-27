@@ -67,11 +67,14 @@ private:
         joy_r = msg->data[0];
         joy_l = msg->data[1];
 
+        duty_cycle_R = joy_r;
+        duty_cycle_L = joy_l;
         PWM_R.ChangeDutyCycle(joy_r);
         PWM_L.ChangeDutyCycle(joy_l);
         
-        RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Left Joystick: %d", joy_r, joy_l);
-        std::cout >> PWM_R >> "," >> PWM_L >> std::endl;
+        RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Right Duty Cycle: %f", joy_r, duty_cycle_R);
+        RCLCPP_INFO(this->get_logger(), "Left Joystick: %d, Left Duty Cycle: %f", joy_l, duty_cycle_L);
+
     }
 
     // メンバ変数
@@ -79,6 +82,8 @@ private:
     GPIO::PWM PWM_L;
     int joy_r;
     int joy_l;
+    double duty_cycle_R;
+    double duty_cycle_L;
     rclcpp::Subscription<std_msgs::msg::Int32MultiArray>::SharedPtr subscription_;
 
 };
