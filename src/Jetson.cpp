@@ -28,10 +28,10 @@ public:
     {
 
         // JetsonGPIOを設定
-        GPIO::setup(R, GPIO::OUT, GPIO::LOW);
-        GPIO::setup(L, GPIO::OUT, GPIO::LOW);
-        GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::HIGH);
-        GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::HIGH);
+        GPIO::setup(R, GPIO::OUT, GPIO::HIGH);
+        GPIO::setup(L, GPIO::OUT, GPIO::HIGH);
+        GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
+        GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
 
         PWM_R.start(0);
         PWM_L.start(0);
