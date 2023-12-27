@@ -24,12 +24,12 @@ void signalHandler(int /*s*/) { end_this_program = true; }
 class SubscriberNode : public rclcpp::Node 
 {
 public:
-    SubscriberNode() : Node("subscriber"), PWM_R(R, 50), PWM_L(L, 50), joy_r(0), joy_l(0)
+    SubscriberNode() : Node("subscriber"), PWM_R(R, 50), PWM_L(L, 50), joy_r(40), joy_l(40)
     {
 
         // JetsonGPIOを設定
-        GPIO::setup(R, GPIO::OUT, GPIO::HIGH);
-        GPIO::setup(L, GPIO::OUT, GPIO::HIGH);
+        GPIO::setup(R, GPIO::OUT, GPIO::LOW);
+        GPIO::setup(L, GPIO::OUT, GPIO::LOW);
         GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
         GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
 
