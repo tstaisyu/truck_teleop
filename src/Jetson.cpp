@@ -15,11 +15,11 @@ using std::placeholders::_1;
 #define ENABLE_r 13
 #define ENABLE_l 16
 
-inline void delay(double s) { std::this_thread::sleep_for(std::chrono::duration<double>(s)); }
+//inline void delay(double s) { std::this_thread::sleep_for(std::chrono::duration<double>(s)); }
 
-static bool end_this_program = false;
+//static bool end_this_program = false;
 
-void signalHandler(int /*s*/) { end_this_program = true; }
+//void signalHandler(int /*s*/) { end_this_program = true; }
 
 class SubscriberNode : public rclcpp::Node 
 {
@@ -51,7 +51,6 @@ public:
 private:
     void ToGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
     {
-        delay(0.2);
 
         if (!msg) {
             RCLCPP_ERROR(this->get_logger(), "Received null pointer in callback");
@@ -66,10 +65,12 @@ private:
         joy_r = msg->data[0];
         joy_l = msg->data[1];
 
+//        delay(0.2);
+        rclcpp::sleep_for(200);
         duty_cycle_R = joy_r;
         duty_cycle_L = joy_l;
-        PWM_R.ChangeDutyCycle(joy_r);
-        PWM_L.ChangeDutyCycle(joy_l);
+        PWM_R.ChangeDutyCycle(duty_cycle_R);
+        PWM_L.ChangeDutyCycle(duty_cycle_L);
         
         RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Right Duty Cycle: %f", joy_r, duty_cycle_R);
         RCLCPP_INFO(this->get_logger(), "Left Joystick: %d, Left Duty Cycle: %f", joy_l, duty_cycle_L);
