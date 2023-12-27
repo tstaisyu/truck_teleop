@@ -47,10 +47,10 @@ public:
         PWM_R.stop();
         PWM_L.stop();
 
+    }
+
     GPIO::PWM PWM_R;
     GPIO::PWM PWM_L;
-    
-    }
 
 private:
     void ToGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
