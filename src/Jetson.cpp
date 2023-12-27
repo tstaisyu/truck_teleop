@@ -30,8 +30,8 @@ public:
         // JetsonGPIOを設定
         GPIO::setup(R, GPIO::OUT, GPIO::LOW);
         GPIO::setup(L, GPIO::OUT, GPIO::LOW);
-        GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
-        GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
+        GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::HIGH);
+        GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::HIGH);
 
         PWM_R.start(0);
         PWM_L.start(0);
@@ -44,12 +44,14 @@ public:
     }
 
     ~SubscriberNode() {
-
+        PWM_R.stop();
+        PWM_L.stop();
     }
 
 private:
     void ToGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
     {
+        delay(0.2);
 
         if (!msg) {
             RCLCPP_ERROR(this->get_logger(), "Received null pointer in callback");
@@ -61,11 +63,6 @@ private:
             return;
         }
 
-    if (!end_this_program)
-    {
-        delay(0.2);
-
-        
         joy_r = msg->data[0];
         joy_l = msg->data[1];
 
@@ -76,11 +73,7 @@ private:
         
         RCLCPP_INFO(this->get_logger(), "Right Joystick: %d, Right Duty Cycle: %f", joy_r, duty_cycle_R);
         RCLCPP_INFO(this->get_logger(), "Left Joystick: %d, Left Duty Cycle: %f", joy_l, duty_cycle_L);
-    } else {
-        PWM_R.stop();
-        PWM_L.stop();
 
-    }
     }
 
     // メンバ変数
