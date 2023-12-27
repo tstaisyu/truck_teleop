@@ -8,18 +8,15 @@
 #include <thread>
 #include <signal.h>
 #include <JetsonGPIO.h>
+
+using namespace std;
 using std::placeholders::_1;
+using namespace GPIO;
 
 #define R 15
 #define L 18
 #define ENABLE_r 13
 #define ENABLE_l 16
-
-//inline void delay(double s) { std::this_thread::sleep_for(std::chrono::duration<double>(s)); }
-
-//static bool end_this_program = false;
-
-//void signalHandler(int /*s*/) { end_this_program = true; }
 
 class SubscriberNode : public rclcpp::Node 
 {
@@ -33,8 +30,8 @@ public:
         GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
         GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
 
-        PWM_R.start(25);
-        PWM_L.start(25);
+        PWM_R.start(50);
+        PWM_L.start(50);
 
         RCLCPP_INFO(this->get_logger(), "GPIO setup completed.");
 
@@ -46,6 +43,7 @@ public:
     ~SubscriberNode() {
         PWM_R.stop();
         PWM_L.stop();
+        GPIO::cleanup(); // Clean up GPIO
     }
 
 private:
@@ -95,6 +93,5 @@ int main(int argc, char * argv[])
     auto node = std::make_shared<SubscriberNode>();
     rclcpp::spin(node);
     rclcpp::shutdown();
-    GPIO::cleanup(); // Clean up GPIO library
     return 0;
 }
