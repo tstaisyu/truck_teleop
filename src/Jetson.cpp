@@ -33,8 +33,8 @@ public:
         GPIO::setup(ENABLE_r, GPIO::OUT, GPIO::LOW);
         GPIO::setup(ENABLE_l, GPIO::OUT, GPIO::LOW);
 
-        PWM_R.start(0);
-        PWM_L.start(0);
+        PWM_R.start(25);
+        PWM_L.start(25);
 
         RCLCPP_INFO(this->get_logger(), "GPIO setup completed.");
 
@@ -46,11 +46,7 @@ public:
     ~SubscriberNode() {
         PWM_R.stop();
         PWM_L.stop();
-
     }
-
-    GPIO::PWM PWM_R;
-    GPIO::PWM PWM_L;
 
 private:
     void ToGpio(const std_msgs::msg::Int32MultiArray::SharedPtr msg)
@@ -82,9 +78,10 @@ private:
     }
 
     // メンバ変数
-
-    int joy_r;
-    int joy_l;
+    GPIO::PWM PWM_R;
+    GPIO::PWM PWM_L;
+    int joy_r = 0;
+    int joy_l = 0;
     double duty_cycle_R;
     double duty_cycle_L;
     rclcpp::Subscription<std_msgs::msg::Int32MultiArray>::SharedPtr subscription_;
