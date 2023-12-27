@@ -46,6 +46,10 @@ public:
     ~SubscriberNode() {
         PWM_R.stop();
         PWM_L.stop();
+
+    GPIO::PWM PWM_R;
+    GPIO::PWM PWM_L;
+    
     }
 
 private:
@@ -78,8 +82,7 @@ private:
     }
 
     // メンバ変数
-    GPIO::PWM PWM_R;
-    GPIO::PWM PWM_L;
+
     int joy_r;
     int joy_l;
     double duty_cycle_R;
